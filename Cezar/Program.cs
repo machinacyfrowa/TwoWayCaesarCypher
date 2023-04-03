@@ -2,6 +2,12 @@
 // przestaw do przodu o (np.) 3 litery:
 // A->D, E->G, ...
 
+using System.Globalization;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
+
+const string chars = "AĄBCĆDEĘFGHIJKLŁMNŃOÓPRSŚTUVWXYZŹŻ ";
+
 string ToAsciiCaesar(string clearText, int key)
 {
 	//zamień wszystkie litery na wielkie
@@ -49,7 +55,6 @@ string FromAsciiCaesar(string encryptedText, int key)
 
 string ToArrayCaesar(string clearText, int key)
 {
-	string chars = "AĄBCĆDEĘFGHIJKLŁMNŃOÓPRSŚTUVWXYZŹŻ";
 	char[] charArray = chars.ToCharArray();
 	clearText = clearText.ToUpper();
 	string encryptedText = "";
@@ -60,7 +65,8 @@ string ToArrayCaesar(string clearText, int key)
 		//dodaj wartość klucza
 		charIndex += key;
 		//jeżeli poza tablicą to zawróć na początek
-		if(charIndex > charArray.Length) 
+		//odejmij jeden bo Length jest zawsze o jeden większy niż największy indeks
+		if(charIndex > charArray.Length - 1) 
 		{ 
 			charIndex -= charArray.Length; 
 		}
@@ -68,6 +74,23 @@ string ToArrayCaesar(string clearText, int key)
 		encryptedText += charArray[charIndex];
 	}
 	return encryptedText;
+}
+string FromArrayCaesar(string encryptedText, int key)
+{
+    char[] charArray = chars.ToCharArray();
+	string clearText = "";
+	foreach (char c in encryptedText) 
+	{
+        //znajdz w tablicy charArray literkę do zakodowania i zapisz jej indeks do charIndex
+        int charIndex = Array.IndexOf(charArray, c);
+        charIndex -= key;
+        if (charIndex < 0)
+        {
+            charIndex += charArray.Length;
+        }
+		clearText += charArray[charIndex];
+    }
+	return clearText;
 }
 
 string text = "TEKST DO ZASZYFROWANIA";
@@ -77,4 +100,6 @@ Console.WriteLine("Zaszyfrowany tekst (ascii): " + cypher);
 text = FromAsciiCaesar(cypher, 3);
 Console.WriteLine("Odszyfrowany tekst (ascii): " + text);
 
-Console.WriteLine("Zaszyfrowany tekst (table): " + ToArrayCaesar("Zażółć gęślą jaźń", 3));
+string text2 = ToArrayCaesar("Zażółć gęślą jaźń", 3);
+Console.WriteLine("Zaszyfrowany tekst (table): " + text2);
+Console.WriteLine("Odzszyfrowany tekst (table): " + FromArrayCaesar(text2, 3));
